@@ -28,6 +28,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ data }) => {
       case 'service': return 'Service Bill';
       case 'product': return 'Product Invoice';
       case 'freelance': return 'Freelance Invoice';
+      case 'fuel-bill': return 'Fuel Bill';
       case 'gas-bill': return 'Gas Bill';
       case 'petrol-bill': return 'Fuel Receipt';
       case 'restaurant-bill': return 'Restaurant Bill';
@@ -37,7 +38,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ data }) => {
 
   // Gas Bill Template
   const renderGasBill = () => (
-    <div id="invoice-preview" className="bg-white p-6 font-mono text-sm max-w-md mx-auto border">
+    <div className="bg-white p-6 font-mono text-sm max-w-md mx-auto border">
       <div className="text-center border-b-2 border-dashed border-gray-400 pb-4 mb-4">
         <h1 className="text-lg font-bold">{data.companyName || 'INDIAN GAS CORPORATION'}</h1>
         <p className="text-xs">DOMESTIC LPG CONSUMER BILL</p>
@@ -105,7 +106,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ data }) => {
 
   // Petrol Bill Template
   const renderPetrolBill = () => (
-    <div id="invoice-preview" className="bg-white p-4 font-mono text-sm max-w-sm mx-auto border">
+    <div className="bg-white p-4 font-mono text-sm max-w-sm mx-auto border">
       <div className="text-center border-b border-gray-400 pb-3 mb-3">
         <h1 className="text-base font-bold">{data.companyName || 'BHARAT PETROLEUM'}</h1>
         <p className="text-xs">FUEL STATION</p>
@@ -176,7 +177,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ data }) => {
 
   // Restaurant Bill Template
   const renderRestaurantBill = () => (
-    <div id="invoice-preview" className="bg-white p-4 font-mono text-sm max-w-sm mx-auto border">
+    <div className="bg-white p-4 font-mono text-sm max-w-sm mx-auto border">
       <div className="text-center border-b border-gray-400 pb-3 mb-3">
         <h1 className="text-base font-bold">{data.companyName || 'SPICE GARDEN RESTAURANT'}</h1>
         <p className="text-xs">{data.companyAddress || 'MG Road, Bangalore'}</p>
@@ -259,23 +260,163 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ data }) => {
     </div>
   );
 
-  // Render appropriate template based on bill type
-  if (data.type === 'gas-bill') {
-    return renderGasBill();
-  }
-  
-  if (data.type === 'petrol-bill') {
-    return renderPetrolBill();
-  }
-  
-  if (data.type === 'restaurant-bill') {
-    return renderRestaurantBill();
-  }
+  const renderFuelBill = () => (
+    <div className="bg-white p-4 font-mono text-sm max-w-sm mx-auto border">
+      <div className="text-center border-b border-gray-400 pb-3 mb-3">
+        <h1 className="text-base font-bold">{data.companyName || 'Your Fuel Station'}</h1>
+        <p className="text-xs">{data.companyAddress || '123 Fuel Lane, Petrolville'}</p>
+        <p className="text-xs">GST: {data.companyPhone || 'YOUR-GST-NO'}</p>
+      </div>
 
-  // Standard invoice template for other types
-  return (
-    <div id="invoice-preview" className="bg-white p-8 shadow-lg max-w-4xl mx-auto">
-      {/* ...standard invoice template... */}
+      <div className="space-y-1 text-xs mb-3">
+        <div className="flex justify-between">
+          <span>Receipt No:</span>
+          <span>{data.invoiceNumber}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Date:</span>
+          <span>{formatDate(data.date)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Time:</span>
+          <span>{formatTime()}</span>
+        </div>
+      </div>
+
+      <div className="border-t border-b border-gray-400 py-2 mb-3">
+        <div className="flex justify-between text-xs">
+          <span>Product:</span>
+          <span>{data.items[0]?.description || 'Fuel'}</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span>Quantity:</span>
+          <span>{data.items[0]?.quantity || 1}.00 LTR</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span>Rate/Ltr:</span>
+          <span>₹{data.items[0]?.price || 100.00}</span>
+        </div>
+      </div>
+
+      <div className="space-y-1 text-xs">
+        <div className="flex justify-between">
+          <span>Subtotal:</span>
+          <span>₹{data.subtotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Tax @ {data.taxRate}%:</span>
+          <span>₹{data.taxAmount.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between font-bold border-t border-gray-400 pt-1">
+          <span>Total:</span>
+          <span>₹{data.total.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div className="text-center mt-3 pt-3 border-t border-dashed border-gray-400">
+        <p className="text-xs">Thank you for your purchase!</p>
+        <p className="text-xs">Drive Safe</p>
+      </div>
     </div>
   );
+
+  const renderStandardInvoice = () => (
+    <div className="bg-white p-8 shadow-lg max-w-4xl mx-auto">
+      <header className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">{getInvoiceTitle()}</h1>
+          <p className="text-gray-500">Invoice #{data.invoiceNumber}</p>
+        </div>
+        <div className="text-right">
+          <h2 className="text-2xl font-bold text-gray-800">{data.companyName}</h2>
+          <pre className="text-gray-500">{data.companyAddress}</pre>
+          <p className="text-gray-500">{data.companyEmail}</p>
+          <p className="text-gray-500">{data.companyPhone}</p>
+        </div>
+      </header>
+
+      <section className="flex justify-between mb-8">
+        <div>
+          <h3 className="text-lg font-bold text-gray-800 mb-2">Bill To:</h3>
+          <p className="font-bold text-gray-700">{data.clientName}</p>
+          <pre className="text-gray-500">{data.clientAddress}</pre>
+          <p className="text-gray-500">{data.clientEmail}</p>
+          <p className="text-gray-500">{data.clientPhone}</p>
+        </div>
+        <div className="text-right">
+          <p><span className="font-bold text-gray-700">Date of Issue:</span> {formatDate(data.date)}</p>
+          <p><span className="font-bold text-gray-700">Due Date:</span> {formatDate(data.dueDate)}</p>
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="text-left py-2 px-4 font-bold text-gray-700">Description</th>
+              <th className="text-center py-2 px-4 font-bold text-gray-700">Quantity</th>
+              <th className="text-right py-2 px-4 font-bold text-gray-700">Price</th>
+              <th className="text-right py-2 px-4 font-bold text-gray-700">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.items.map(item => (
+              <tr key={item.id} className="border-b">
+                <td className="py-2 px-4">{item.description}</td>
+                <td className="text-center py-2 px-4">{item.quantity}</td>
+                <td className="text-right py-2 px-4">₹{item.price.toFixed(2)}</td>
+                <td className="text-right py-2 px-4">₹{item.total.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="flex justify-end mb-8">
+        <div className="w-1/3">
+          <div className="flex justify-between mb-2">
+            <span className="text-gray-700">Subtotal</span>
+            <span className="text-gray-800">₹{data.subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between mb-2">
+            <span className="text-gray-700">Discount ({data.discountRate}%)</span>
+            <span className="text-red-500">-₹{data.discountAmount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between mb-2">
+            <span className="text-gray-700">Tax ({data.taxRate}%)</span>
+            <span className="text-gray-800">₹{data.taxAmount.toFixed(2)}</span>
+          </div>
+          <div className="border-t my-2"></div>
+          <div className="flex justify-between font-bold text-lg">
+            <span className="text-gray-800">Total</span>
+            <span className="text-gray-800">₹{data.total.toFixed(2)}</span>
+          </div>
+        </div>
+      </section>
+
+      <footer className="text-gray-500">
+        <h4 className="font-bold text-gray-700 mb-2">Notes</h4>
+        <pre className="mb-4">{data.notes}</pre>
+        <h4 className="font-bold text-gray-700 mb-2">Payment Terms</h4>
+        <pre>{data.paymentTerms}</pre>
+      </footer>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (data.type) {
+      case 'gas-bill':
+        return renderGasBill();
+      case 'petrol-bill':
+        return renderPetrolBill();
+      case 'restaurant-bill':
+        return renderRestaurantBill();
+      case 'fuel-bill':
+        return renderFuelBill();
+      default:
+        return renderStandardInvoice();
+    }
+  };
+
+  return <div id="invoice-preview">{renderContent()}</div>;
 };

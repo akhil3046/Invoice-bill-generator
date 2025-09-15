@@ -153,6 +153,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange }) => {
             <option value="service">Service Bill</option>
             <option value="product">Product Invoice</option>
             <option value="freelance">Freelance Invoice</option>
+            <option value="fuel-bill">Fuel Bill</option>
             <option value="gas-bill">Indian Gas Bill</option>
             <option value="petrol-bill">Indian Petrol Bill</option>
             <option value="restaurant-bill">Restaurant Bill</option>
